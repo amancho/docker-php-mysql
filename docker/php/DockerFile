@@ -1,0 +1,58 @@
+ARG php_version
+
+FROM php:${php_version}
+
+RUN docker-php-ext-install mysqli pdo pdo_mysql
+
+# install Intl
+RUN apt-get -y update \
+&& apt-get install -y zlib1g-dev libicu-dev g++ \
+&& docker-php-ext-configure intl \
+&& docker-php-ext-install intl \
+&& docker-php-ext-enable intl
+
+# install Java
+USER root
+RUN mkdir -p /usr/share/man/man1 && \
+    apt-get update -y && \
+    apt-get install -y default-jre && \
+    java -version
+    
+#install zip
+RUN apt-get install -y \
+        libzip-dev \
+        zip \
+  && docker-php-ext-install zip
+
+# install imap
+RUN apt-get update \
+&& apt-get install -y libc-client-dev libkrb5-dev \
+&& rm -r /var/lib/apt/lists/ \
+&& docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
+&& docker-php-ext-install imap
+
+RUN a2enmod rewrite
+
+RUN curl -o ioncube.tar.gz http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz \
+    && tar -xvvzf ioncube.tar.gz \
+    && mv ioncube/ioncube_loader_lin_7.3.so `php-config --extension-dir` \
+    && rm -Rf ioncube.tar.gz ioncube \
+    && docker-php-ext-enable ioncube_loader_lin_7.3
+
+RUN yes | pecl install xdebug
+
+RUN curl -fsSL 'https://xdebug.org/files/xdebug-2.9.6.tgz' -o xdebug.tar.gz \
+    && mkdir -p xdebug \
+    && tar -xf xdebug.tar.gz -C xdebug --strip-components=1 \
+    && rm xdebug.tar.gz \
+    && ( \
+    cd xdebug \
+    && phpize \
+    && ./configure --enable-xdebug \
+    && make -j$(nproc) \
+    && make install \
+    ) \
+    && rm -r xdebug \
+    && docker-php-ext-enable xdebug
+
+RUN ln -s /etc/apache2/mods-available/headers.load /etc/apache2/mods-enabled/headers.load
