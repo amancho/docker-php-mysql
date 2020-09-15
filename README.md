@@ -84,6 +84,5 @@ chmod 777 .bash_aliases
 
 ## Instalación paso a paso
 * cd /{path}
-* git clone https://{username}@bitbucket.org/{username}/docker-php-mysql.git
-* mkdir ~/docker-php-mysql/www/KmaleonWEB3
-* mkdir ~/docker-php-mysql/www/KmaleonWEB
+* git clone https://github.com/{username}/docker-php-mysql.git
+* mkdir ~/docker-php-mysql/www/{projectName}
