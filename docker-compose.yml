@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  mysql:
+    build:
+      context: ./docker/mysql
+      args:
+        mysql_version: ${MYSQL_VERSION}
+      dockerfile: DockerFile
+    container_name: ${COMPOSE_PROJECT_NAME}-mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    restart: always
+
+  php:
+    build:
+      context: ./docker/php
+      args:
+        php_version: ${PHP_VERSION}
+      dockerfile: DockerFile
+    container_name: ${COMPOSE_PROJECT_NAME}-php
+    environment:
+      TZ: "Europe/Madrid"
+      PHP_EXTENSION_XDEBUG: 1
+      PHP_INI_XDEBUG__REMOTE_PORT: 9000
+      PHP_IDE_CONFIG: "serverName=docker-php"
+      XDEBUG_CONFIG: "log_errors=1 remote_autostart=1 remote_enable=1"
+    ports:
+      - "${PHP_PORT}:80"
+    volumes:
+      - ./www:/var/www/html
+      - /mnt/I:/mnt/I
+      - /mnt/H:/mnt/H
+      - ./docker/php/virtualhost.conf:/etc/apache2/sites-enabled/000-default.conf
+      - ./docker/php/php.ini:/usr/local/etc/php/php.ini
+    links:
+      - mysql
