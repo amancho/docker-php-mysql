@@ -26,7 +26,8 @@ La instalación se hace en línea de comandos:
 ```zsh
 docker-compose up -d
 ```
-Puedes vaidar que se ha instalado correctamente accediendo a: [http://localhost/info.php](http://localhost/info.php)
+Puedes validar que se ha instalado correctamente accediendo a: [http://localhost/info.php](http://localhost/info.php)
+* Es necesario crear el info.php manualmente
 
 ## Comandos disponibles
 
@@ -86,3 +87,5 @@ chmod 777 .bash_aliases
 * cd /{path}
 * git clone https://github.com/{username}/docker-php-mysql.git
 * mkdir ~/docker-php-mysql/www/{projectName}
+* cd ~/docker-php-mysql/www/{projectName}
+* echo "<?php phpinfo(); " > info.php (Opcional, fichero de test)
